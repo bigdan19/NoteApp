@@ -19,6 +19,7 @@ class MainTableViewController: UITableViewController {
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(organizeButtonPressed))
@@ -30,13 +31,15 @@ class MainTableViewController: UITableViewController {
         let ac = UIAlertController(title: "Add Category", message: nil, preferredStyle: .alert)
         ac.addTextField()
         
-        let submitAction = UIAlertAction(title: "Done", style: .default) { [unowned ac] _ in
+        let submitAction = UIAlertAction(title: "Create", style: .default) { [unowned ac] _ in
             guard let name = ac.textFields![0].text else { return }
             self.datasource.append(("\(name)", []))
-            self.tableView.reloadData()
+            DispatchQueue.main.async {
+                self.tableView.reloadData()
+            }
         }
         ac.addAction(submitAction)
-        ac.addAction(UIAlertAction(title: "cancel", style: .cancel))
+        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         present(ac, animated: true)
     }
     
@@ -44,24 +47,26 @@ class MainTableViewController: UITableViewController {
     @objc func addButtonPressed() {
         let ac = UIAlertController(title: "Choose Category", message: nil, preferredStyle: .actionSheet)
         for i in 0..<datasource.count {
-            ac.addAction(UIAlertAction(title: "\(datasource[i].0)", style: .default, handler: chooseCategory))
+            ac.addAction(UIAlertAction(title: "\(datasource[i].0)", style: .default, handler: choosenCategory))
         }
-        ac.addAction(UIAlertAction(title: "cancel", style: .cancel))
+        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         ac.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
         present(ac, animated: true)
     }
     
     // function that is handling choosen category when creating new note
-    func chooseCategory(action: UIAlertAction) {
+    func choosenCategory(action: UIAlertAction) {
         let ac = UIAlertController(title: "Write your note", message: nil, preferredStyle: .alert)
         ac.addTextField()
         
-        let submitAction = UIAlertAction(title: "Done", style: .default) { [unowned self] _ in
+        let submitAction = UIAlertAction(title: "Create", style: .default) { [unowned self] _ in
             guard let text = ac.textFields![0].text else { return }
             for i in 0..<datasource.count {
                 if datasource[i].0 == action.title! {
                     datasource[i].1.append(text)
-                    self.tableView.reloadData()
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                    }
                 }
             }
         }
@@ -82,7 +87,8 @@ class MainTableViewController: UITableViewController {
     
     // setting title for every section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return datasource[section].sectionName
+//        return datasource[section].sectionName
+        return "\(datasource[section].sectionName + " (\(datasource[section].1.count))")"
     }
 
     // creating cell
@@ -93,49 +99,24 @@ class MainTableViewController: UITableViewController {
         return cell
     }
 
-    /*
-    // Override to support conditional editing of the table view.
-    override func tableView(_ tableView: UITableView, canEditRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the specified item to be editable.
-        return true
+    override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
+        return .delete
     }
-    */
-
-    /*
-    // Override to support editing the table view.
+    
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
-            // Delete the row from the data source
+            tableView.beginUpdates()
+            
+            // deleting item from our database
+            
+            datasource[indexPath.section].1.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
-        } else if editingStyle == .insert {
-            // Create a new instance of the appropriate class, insert it into the array, and add a new row to the table view
-        }    
+            
+            tableView.endUpdates()
+            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 ){
+                self.tableView.reloadData()
+            }
+        }
     }
-    */
-
-    /*
-    // Override to support rearranging the table view.
-    override func tableView(_ tableView: UITableView, moveRowAt fromIndexPath: IndexPath, to: IndexPath) {
-
-    }
-    */
-
-    /*
-    // Override to support conditional rearranging of the table view.
-    override func tableView(_ tableView: UITableView, canMoveRowAt indexPath: IndexPath) -> Bool {
-        // Return false if you do not want the item to be re-orderable.
-        return true
-    }
-    */
-
-    /*
-    // MARK: - Navigation
-
-    // In a storyboard-based application, you will often want to do a little preparation before navigation
-    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
-        // Get the new view controller using segue.destination.
-        // Pass the selected object to the new view controller.
-    }
-    */
 
 }
