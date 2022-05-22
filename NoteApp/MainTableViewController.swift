@@ -10,21 +10,46 @@ import UIKit
 class MainTableViewController: UITableViewController {
 
     // OUR database for this current stage
-    var datasource: [(sectionName: String, sectionElements: [String])] =
-    [
-        ("Work", ["Brush floor", "finish courses", "check rota"]),
-        ("Home", ["mop floor", "make laudry", "wash dishes"])
-    ]
+//    var dataSource: [(sectionName: String, sectionElements: [String])] =
+//    [
+//        ("Work", ["Brush floor", "finish courses", "check rota"]),
+//        ("Home", ["mop floor", "make laudry", "wash dishes"])
+//    ]
+//    var dataSource: [(sectionName: String, sectionElements: [String])] = []
+    
+    let defaults = UserDefaults.standard
+    
+    var data: NotesArr = NotesArr(arrayOfNotes: [])
+    
+    
+    
+//    var data: NotesArr = NotesArr(arrayOfNotes: [Notes(sectionName: "Work", sectionElements: ["Brush floor", "finish courses", "check rota"]), Notes(sectionName: "Home", sectionElements: ["mop floor", "make laudry", "wash dishes"])])
+    
     
     
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        
+        decodeData()
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(organizeButtonPressed))
-        
+    }
+    
+    func encodeData() {
+        let encoder = JSONEncoder()
+        if let encoded = try? encoder.encode(data) {
+            defaults.set(encoded, forKey: "SavedData")
+        }
+    }
+    
+    func decodeData() {
+        if let savedData = defaults.object(forKey: "SavedData") as? Data {
+            let decoder = JSONDecoder()
+            if let loadedData = try? decoder.decode(NotesArr.self, from: savedData){
+                data = loadedData
+            }
+        }
     }
     
     func showErrorMessage(title: String, message: String) {
@@ -43,9 +68,10 @@ class MainTableViewController: UITableViewController {
             if name == "" {
                 self.showErrorMessage(title: "Error", message: "Category name can't be empty")
             } else {
-                self.datasource.append(("\(name)", []))
+                self.data.arrayOfNotes.append(Notes(sectionName: "\(name)", sectionElements: []))
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
+                    self.encodeData()
                 }
             }
             
@@ -59,8 +85,8 @@ class MainTableViewController: UITableViewController {
     // Creating new note in choosen category
     @objc func addButtonPressed() {
         let ac = UIAlertController(title: "Choose Category", message: nil, preferredStyle: .actionSheet)
-        for i in 0..<datasource.count {
-            ac.addAction(UIAlertAction(title: "\(datasource[i].0)", style: .default, handler: choosenCategory))
+        for i in 0..<data.arrayOfNotes.count {
+            ac.addAction(UIAlertAction(title: "\(data.arrayOfNotes[i].sectionName)", style: .default, handler: choosenCategory))
         }
         ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
         ac.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
@@ -78,11 +104,13 @@ class MainTableViewController: UITableViewController {
             if text == "" {
                 showErrorMessage(title: "Error", message: "New note can't be empty")
             } else {
-                for i in 0..<datasource.count {
-                    if datasource[i].0 == action.title! {
-                        datasource[i].1.append(text)
+                for i in 0..<data.arrayOfNotes.count {
+                    
+                    if data.arrayOfNotes[i].sectionName == action.title! {
+                        data.arrayOfNotes[i].sectionElements.append(text)
                         DispatchQueue.main.async {
                             self.tableView.reloadData()
+                            self.encodeData()
                         }
                     }
                 }
@@ -96,24 +124,24 @@ class MainTableViewController: UITableViewController {
 
     // Setting number of sections in tableView
     override func numberOfSections(in tableView: UITableView) -> Int {
-        return datasource.count
+        return data.arrayOfNotes.count
     }
 
     // Setting number of rows in each section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return datasource[section].sectionElements.count
+        return data.arrayOfNotes[section].sectionElements.count
     }
     
     // Setting title for every section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        return datasource[section].sectionName
-        return "\(datasource[section].sectionName + " (\(datasource[section].1.count))")"
+//        return dataSource[section].sectionName
+        return "\(data.arrayOfNotes[section].sectionName + " (\(data.arrayOfNotes[section].sectionElements.count))")"
     }
 
     // Creating cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        let note = datasource[indexPath.section].sectionElements[indexPath.row]
+        let note = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
         cell.textLabel?.text = note
         return cell
     }
@@ -128,25 +156,24 @@ class MainTableViewController: UITableViewController {
             
             // Deleting item from our database
             
-            datasource[indexPath.section].1.remove(at: indexPath.row)
+            data.arrayOfNotes[indexPath.section].sectionElements.remove(at: indexPath.row)
             tableView.deleteRows(at: [indexPath], with: .fade)
             
+            
             // Checking if there is no more notes in a category - remove category
-            if datasource[indexPath.section].1.count == 0 {
-                datasource.remove(at: indexPath.section)
+            
+            if data.arrayOfNotes[indexPath.section].sectionElements.count == 0 {
+                data.arrayOfNotes.remove(at: indexPath.section)
                 tableView.deleteSections(IndexSet(integer: indexPath.section), with: .fade)
             }
-            tableView.endUpdates()
             
+            tableView.endUpdates()
             // Reloading tableView data after 0.3 sec
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 ){
                 self.tableView.reloadData()
+                self.encodeData()
             }
         }
     }
 
 }
-
-
-// TODO: Potencially deleting a category from database if amount of notes are = 0
-// Updating the UI
