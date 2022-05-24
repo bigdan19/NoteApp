@@ -8,24 +8,11 @@
 import UIKit
 
 class MainTableViewController: UITableViewController {
-
-    // OUR database for this current stage
-//    var dataSource: [(sectionName: String, sectionElements: [String])] =
-//    [
-//        ("Work", ["Brush floor", "finish courses", "check rota"]),
-//        ("Home", ["mop floor", "make laudry", "wash dishes"])
-//    ]
-//    var dataSource: [(sectionName: String, sectionElements: [String])] = []
     
     let defaults = UserDefaults.standard
     
     var data: NotesArr = NotesArr(arrayOfNotes: [])
-    
-    
-    
-//    var data: NotesArr = NotesArr(arrayOfNotes: [Notes(sectionName: "Work", sectionElements: ["Brush floor", "finish courses", "check rota"]), Notes(sectionName: "Home", sectionElements: ["mop floor", "make laudry", "wash dishes"])])
-    
-    
+
     
 
     override func viewDidLoad() {
@@ -36,6 +23,7 @@ class MainTableViewController: UITableViewController {
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(organizeButtonPressed))
     }
     
+    // encoding data to save in userDefaults
     func encodeData() {
         let encoder = JSONEncoder()
         if let encoded = try? encoder.encode(data) {
@@ -43,6 +31,7 @@ class MainTableViewController: UITableViewController {
         }
     }
     
+    // decoding data to load it from userDefaults
     func decodeData() {
         if let savedData = defaults.object(forKey: "SavedData") as? Data {
             let decoder = JSONDecoder()
@@ -96,31 +85,25 @@ class MainTableViewController: UITableViewController {
     
     // Function that is handling choosen category when creating new note
     func choosenCategory(action: UIAlertAction) {
-        let ac = UIAlertController(title: "Write your note", message: nil, preferredStyle: .alert)
-        ac.addTextField()
         
-        let submitAction = UIAlertAction(title: "Create", style: .default) { [unowned self] _ in
-            guard let text = ac.textFields![0].text else { return }
-            if text == "" {
-                showErrorMessage(title: "Error", message: "New note can't be empty")
-            } else {
-                for i in 0..<data.arrayOfNotes.count {
-                    
-                    if data.arrayOfNotes[i].sectionName == action.title! {
-                        data.arrayOfNotes[i].sectionElements.append(text)
-                        DispatchQueue.main.async {
-                            self.tableView.reloadData()
-                            self.encodeData()
-                        }
+        guard let vc = storyboard?.instantiateViewController(withIdentifier: "new") as? EntryViewController else { return }
+        vc.title = "New Note"
+        vc.navigationItem.largeTitleDisplayMode = .never
+        vc.completion = { note in
+            self.navigationController?.popToRootViewController(animated: true)
+            for i in 0..<self.data.arrayOfNotes.count {
+                if self.data.arrayOfNotes[i].sectionName == action.title! {
+                    self.data.arrayOfNotes[i].sectionElements.append(note)
+                    DispatchQueue.main.async {
+                        self.tableView.reloadData()
+                        self.encodeData()
                     }
                 }
             }
-            
         }
-        ac.addAction(submitAction)
-        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        present(ac, animated: true)
+        navigationController?.pushViewController(vc, animated: true)
     }
+    
 
     // Setting number of sections in tableView
     override func numberOfSections(in tableView: UITableView) -> Int {
@@ -131,6 +114,14 @@ class MainTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return data.arrayOfNotes[section].sectionElements.count
     }
+    
+    override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
+        guard let header = view as? UITableViewHeaderFooterView else { return }
+        header.textLabel?.textAlignment = .left
+        header.textLabel?.textColor = .black
+        header.textLabel?.font = UIFont.boldSystemFont(ofSize: 15)
+    }
+
     
     // Setting title for every section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
@@ -150,6 +141,17 @@ class MainTableViewController: UITableViewController {
         return .delete
     }
     
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        guard let vc = storyboard?.instantiateViewController(withIdentifier: "note") as? NoteViewController else { return }
+        let note = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
+        vc.navigationItem.largeTitleDisplayMode = .never
+        vc.title = "Note"
+        vc.note = note
+        navigationController?.pushViewController(vc, animated: true)
+    }
+    
+    
+    // editing tableView
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             tableView.beginUpdates()
