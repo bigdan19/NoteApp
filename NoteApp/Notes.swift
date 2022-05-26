@@ -10,9 +10,14 @@ import Foundation
 
 struct Notes: Codable {
     var sectionName: String
-    var sectionElements: [String]
+    var sectionElements: [Elements]
 }
 
 struct NotesArr: Codable {
     var arrayOfNotes: [Notes]
+}
+
+struct Elements: Codable {
+    var note: String
+    var date: String
 }

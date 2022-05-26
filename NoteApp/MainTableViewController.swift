@@ -12,11 +12,14 @@ class MainTableViewController: UITableViewController {
     let defaults = UserDefaults.standard
     
     var data: NotesArr = NotesArr(arrayOfNotes: [])
+    
+    var dateFormatter = DateFormatter()
 
     
 
     override func viewDidLoad() {
         super.viewDidLoad()
+        view.backgroundColor = UIColor.systemGray6
         decodeData()
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
@@ -89,11 +92,11 @@ class MainTableViewController: UITableViewController {
         guard let vc = storyboard?.instantiateViewController(withIdentifier: "new") as? EntryViewController else { return }
         vc.title = "New Note"
         vc.navigationItem.largeTitleDisplayMode = .never
-        vc.completion = { note in
+        vc.completion = { note, date in
             self.navigationController?.popToRootViewController(animated: true)
             for i in 0..<self.data.arrayOfNotes.count {
                 if self.data.arrayOfNotes[i].sectionName == action.title! {
-                    self.data.arrayOfNotes[i].sectionElements.append(note)
+                    self.data.arrayOfNotes[i].sectionElements.append(Elements(note: note, date: date))
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
                         self.encodeData()
@@ -117,23 +120,28 @@ class MainTableViewController: UITableViewController {
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         guard let header = view as? UITableViewHeaderFooterView else { return }
-        header.textLabel?.textAlignment = .left
         header.textLabel?.textColor = .black
-        header.textLabel?.font = UIFont.boldSystemFont(ofSize: 15)
+        header.textLabel?.font = UIFont.boldSystemFont(ofSize: 24)
+        header.textLabel?.frame = header.bounds.offsetBy(dx: 20, dy: 0)
     }
 
     
     // Setting title for every section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-//        return dataSource[section].sectionName
-        return "\(data.arrayOfNotes[section].sectionName + " (\(data.arrayOfNotes[section].sectionElements.count))")"
+        return "\(data.arrayOfNotes[section].sectionName)"
     }
 
     // Creating cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
         let note = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
-        cell.textLabel?.text = note
+        cell.textLabel?.text = note.note
+        cell.detailTextLabel?.text = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row].date
+        cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
+        cell.layer.borderWidth = 0.1
+        cell.layer.borderColor = CGColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1)
+        cell.layer.cornerRadius = 10
+        cell.layer.masksToBounds = true
         return cell
     }
 
@@ -146,7 +154,7 @@ class MainTableViewController: UITableViewController {
         let note = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
         vc.navigationItem.largeTitleDisplayMode = .never
         vc.title = "Note"
-        vc.note = note
+        vc.note = note.note
         navigationController?.pushViewController(vc, animated: true)
     }
     

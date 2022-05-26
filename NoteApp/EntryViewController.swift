@@ -10,7 +10,11 @@ import UIKit
 class EntryViewController: UIViewController {
     @IBOutlet var noteField: UITextView!
     
-    public var completion: ((String) -> Void)?
+    public var completion: ((String, String) -> Void)?
+    
+    private var formater = DateFormatter()
+    
+    
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -19,9 +23,13 @@ class EntryViewController: UIViewController {
     }
     
     @objc func didTapSave() {
-        if let text = noteField.text, !text.isEmpty {
-            completion?(text)
-        }
+        let today = Date.now
+        formater.dateStyle = .full
+        let dateStr = formater.string(from: today)
+            if let text = noteField.text, !text.isEmpty {
+                completion?(text, dateStr)
+            }
+        
     }
     
 
