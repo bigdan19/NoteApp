@@ -12,18 +12,34 @@ class MainTableViewController: UITableViewController {
     let defaults = UserDefaults.standard
     
     var data: NotesArr = NotesArr(arrayOfNotes: [])
+    var arrOfData: [Elements] = []
+    var filteredData: [Elements] = []
     
     var dateFormatter = DateFormatter()
-
     
+    let searchController = UISearchController(searchResultsController: nil)
+
+    var isSearchBarEmpty: Bool {
+        return searchController.searchBar.text?.isEmpty ?? true
+    }
+    
+    var isFiltering: Bool {
+        return searchController.isActive && !isSearchBarEmpty
+    }
 
     override func viewDidLoad() {
         super.viewDidLoad()
-        view.backgroundColor = UIColor.systemGray6
         decodeData()
+        createDictOfDataForFiltering()
+        view.backgroundColor = UIColor.systemGray6
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
         navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(organizeButtonPressed))
+        searchController.searchResultsUpdater = self
+        searchController.obscuresBackgroundDuringPresentation = false
+        searchController.searchBar.placeholder = "Search Notes"
+        navigationItem.searchController = searchController
+        definesPresentationContext = true
     }
     
     // encoding data to save in userDefaults
@@ -110,38 +126,63 @@ class MainTableViewController: UITableViewController {
 
     // Setting number of sections in tableView
     override func numberOfSections(in tableView: UITableView) -> Int {
+        if isFiltering {
+            return 1
+        }
         return data.arrayOfNotes.count
     }
 
     // Setting number of rows in each section
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        if isFiltering {
+            return filteredData.count
+        }
         return data.arrayOfNotes[section].sectionElements.count
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
-        guard let header = view as? UITableViewHeaderFooterView else { return }
-        header.textLabel?.textColor = .black
-        header.textLabel?.font = UIFont.boldSystemFont(ofSize: 24)
-        header.textLabel?.frame = header.bounds.offsetBy(dx: 20, dy: 0)
+        if isFiltering {
+             
+        } else {
+            guard let header = view as? UITableViewHeaderFooterView else { return }
+            header.textLabel?.textColor = .black
+            header.textLabel?.font = UIFont.boldSystemFont(ofSize: 24)
+            header.textLabel?.frame = header.bounds.offsetBy(dx: 20, dy: 0)
+        }
     }
 
     
     // Setting title for every section
     override func tableView(_ tableView: UITableView, titleForHeaderInSection section: Int) -> String? {
-        return "\(data.arrayOfNotes[section].sectionName)"
+        if isFiltering { return nil }
+        else {
+            return "\(data.arrayOfNotes[section].sectionName)"
+        }
     }
 
     // Creating cell
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
-        let note = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
-        cell.textLabel?.text = note.note
-        cell.detailTextLabel?.text = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row].date
-        cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
-        cell.layer.borderWidth = 0.1
-        cell.layer.borderColor = CGColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1)
-        cell.layer.cornerRadius = 10
-        cell.layer.masksToBounds = true
+        let note: Elements
+        if isFiltering {
+            note = filteredData[indexPath.row]
+            cell.textLabel?.text = note.note
+            cell.detailTextLabel?.text = filteredData[indexPath.row].date
+            cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
+            cell.layer.borderWidth = 0.1
+            cell.layer.borderColor = CGColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1)
+            cell.layer.cornerRadius = 10
+            cell.layer.masksToBounds = true
+        } else {
+            note = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
+            cell.textLabel?.text = note.note
+            cell.detailTextLabel?.text = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row].date
+            cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
+            cell.layer.borderWidth = 0.1
+            cell.layer.borderColor = CGColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1)
+            cell.layer.cornerRadius = 10
+            cell.layer.masksToBounds = true
+        }
         return cell
     }
 
@@ -150,40 +191,83 @@ class MainTableViewController: UITableViewController {
     }
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        guard let vc = storyboard?.instantiateViewController(withIdentifier: "note") as? NoteViewController else { return }
-        let note = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
-        vc.navigationItem.largeTitleDisplayMode = .never
-        vc.title = "Note"
-        vc.note = note.note
-        navigationController?.pushViewController(vc, animated: true)
+        if isFiltering {
+            guard let vc = storyboard?.instantiateViewController(withIdentifier: "note") as? NoteViewController else { return }
+            let note = filteredData[indexPath.row]
+            vc.navigationItem.largeTitleDisplayMode = .never
+            vc.title = "Note"
+            vc.note = note.note
+            navigationController?.pushViewController(vc, animated: true)
+        } else {
+            guard let vc = storyboard?.instantiateViewController(withIdentifier: "note") as? NoteViewController else { return }
+            let note = data.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
+            vc.navigationItem.largeTitleDisplayMode = .never
+            vc.title = "Note"
+            vc.note = note.note
+            navigationController?.pushViewController(vc, animated: true)
+        }
     }
     
     
     // editing tableView
     override func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            tableView.beginUpdates()
-            
-            // Deleting item from our database
-            
-            data.arrayOfNotes[indexPath.section].sectionElements.remove(at: indexPath.row)
-            tableView.deleteRows(at: [indexPath], with: .fade)
-            
-            
-            // Checking if there is no more notes in a category - remove category
-            
-            if data.arrayOfNotes[indexPath.section].sectionElements.count == 0 {
-                data.arrayOfNotes.remove(at: indexPath.section)
-                tableView.deleteSections(IndexSet(integer: indexPath.section), with: .fade)
-            }
-            
-            tableView.endUpdates()
-            // Reloading tableView data after 0.3 sec
-            DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 ){
-                self.tableView.reloadData()
-                self.encodeData()
+        if isFiltering {
+             
+        } else {
+            if editingStyle == .delete {
+                tableView.beginUpdates()
+                
+                // Deleting item from our database
+                
+                data.arrayOfNotes[indexPath.section].sectionElements.remove(at: indexPath.row)
+                tableView.deleteRows(at: [indexPath], with: .fade)
+                
+                
+                // Checking if there is no more notes in a category - remove category
+                
+                if data.arrayOfNotes[indexPath.section].sectionElements.count == 0 {
+                    data.arrayOfNotes.remove(at: indexPath.section)
+                    tableView.deleteSections(IndexSet(integer: indexPath.section), with: .fade)
+                }
+                
+                tableView.endUpdates()
+                // Reloading tableView data after 0.3 sec
+                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 ){
+                    self.tableView.reloadData()
+                    self.encodeData()
+                }
             }
         }
     }
 
+    
+    func filterContentForSearchText(_ searchText: String) {
+        
+        filteredData = arrOfData.filter({ (element: Elements) -> Bool in
+            return element.note.lowercased().contains(searchText.lowercased())
+        })
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+        
+    }
+    
+    func createDictOfDataForFiltering() {
+        for i in 0..<data.arrayOfNotes.count {
+            for j in 0..<data.arrayOfNotes[i].sectionElements.count {
+                arrOfData.append(data.arrayOfNotes[i].sectionElements[j])
+            }
+        }
+    }
+    
+}
+
+extension MainTableViewController: UISearchResultsUpdating {
+    func updateSearchResults(for searchController: UISearchController) {
+        let searchBar = searchController.searchBar
+        filterContentForSearchText(searchBar.text!)
+        DispatchQueue.main.async {
+            self.tableView.reloadData()
+        }
+    }
 }
