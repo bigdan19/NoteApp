@@ -26,11 +26,11 @@ class EntryViewController: UIViewController {
         let today = Date.now
         formater.dateStyle = .full
         let dateStr = formater.string(from: today)
-            if let text = noteField.text, !text.isEmpty {
-                completion?(text, dateStr)
-            }
+        if let text = noteField.text, !text.isEmpty {
+            completion?(text, dateStr)
+        }
         
     }
     
-
+    
 }

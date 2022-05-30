@@ -16,7 +16,7 @@ class NoteViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         noteLabel.text = note
-
+        
         // Do any additional setup after loading the view.
     }
     
