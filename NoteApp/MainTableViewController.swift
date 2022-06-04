@@ -42,15 +42,21 @@ class MainTableViewController: UITableViewController {
     func createUI() {
         view.backgroundColor = UIColor.systemGray6
         navigationController?.navigationBar.prefersLargeTitles = true
-        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(addButtonPressed))
-        navigationItem.leftBarButtonItem = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(organizeButtonPressed))
+        navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editButtonPressed))
         searchController.searchResultsUpdater = self
         searchController.obscuresBackgroundDuringPresentation = false
         searchController.searchBar.placeholder = "Search Notes"
         navigationItem.searchController = searchController
         definesPresentationContext = true
+        configureKeyboardToolbar()
     }
     
+    func configureKeyboardToolbar() {
+        let organize = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(organizeButtonPressed))
+        let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
+        let add = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(composeButtonPressed))
+        toolbarItems = [organize, flexibleSpace, add]
+    }
     
     
     // encoding data to save in userDefaults
@@ -80,6 +86,16 @@ class MainTableViewController: UITableViewController {
         present(ac, animated: true)
     }
     
+    @objc func editButtonPressed() {
+        if (self.tableView.isEditing == true) {
+            self.tableView.isEditing = false
+            self.navigationItem.rightBarButtonItem?.title = "Edit"
+        } else {
+            self.tableView.isEditing = true
+            self.navigationItem.rightBarButtonItem?.title = "Done"
+        }
+    }
+    
     
     
     // Creating new Category for notes
@@ -107,14 +123,18 @@ class MainTableViewController: UITableViewController {
     
     
     // Creating new note in choosen category
-    @objc func addButtonPressed() {
-        let ac = UIAlertController(title: "Choose Category", message: nil, preferredStyle: .actionSheet)
-        for i in 0..<mainData.arrayOfNotes.count {
-            ac.addAction(UIAlertAction(title: "\(mainData.arrayOfNotes[i].sectionName)", style: .default, handler: choosenCategory))
+    @objc func composeButtonPressed() {
+        if mainData.arrayOfNotes.isEmpty {
+            showErrorMessage(title: "Error", message: "Please create at least one category")
+        } else {
+            let ac = UIAlertController(title: "Choose Category", message: nil, preferredStyle: .actionSheet)
+            for i in 0..<mainData.arrayOfNotes.count {
+                ac.addAction(UIAlertAction(title: "\(mainData.arrayOfNotes[i].sectionName)", style: .default, handler: choosenCategory))
+            }
+            ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
+            ac.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
+            present(ac, animated: true)
         }
-        ac.addAction(UIAlertAction(title: "Cancel", style: .cancel))
-        ac.popoverPresentationController?.barButtonItem = self.navigationItem.rightBarButtonItem
-        present(ac, animated: true)
     }
     
     

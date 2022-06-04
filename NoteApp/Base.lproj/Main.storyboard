@@ -47,7 +47,9 @@
                             <outlet property="delegate" destination="LC1-kF-DL2" id="MPg-G7-h7s"/>
                         </connections>
                     </tableView>
+                    <toolbarItems/>
                     <navigationItem key="navigationItem" title="Notes" id="V5v-KF-58z"/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                 </tableViewController>
                 <placeholder placeholderIdentifier="IBFirstResponder" id="YnY-4B-adt" userLabel="First Responder" customClass="UIResponder" sceneMemberID="firstResponder"/>
             </objects>
@@ -89,13 +91,17 @@
         <!--Navigation Controller-->
         <scene sceneID="OZy-FQ-MTN">
             <objects>
-                <navigationController automaticallyAdjustsScrollViewInsets="NO" id="quL-FY-zeN" sceneMemberID="viewController">
+                <navigationController automaticallyAdjustsScrollViewInsets="NO" toolbarHidden="NO" id="quL-FY-zeN" sceneMemberID="viewController">
                     <toolbarItems/>
                     <navigationBar key="navigationBar" contentMode="scaleToFill" id="zu0-dq-UGP">
                         <rect key="frame" x="0.0" y="44" width="414" height="44"/>
                         <autoresizingMask key="autoresizingMask"/>
                     </navigationBar>
                     <nil name="viewControllers"/>
+                    <toolbar key="toolbar" opaque="NO" clearsContextBeforeDrawing="NO" contentMode="scaleToFill" insetsLayoutMarginsFromSafeArea="NO" id="XT4-oj-1M3">
+                        <rect key="frame" x="0.0" y="813" width="414" height="49"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </toolbar>
                     <connections>
                         <segue destination="LC1-kF-DL2" kind="relationship" relationship="rootViewController" id="5D1-xR-aVo"/>
                     </connections>
@@ -113,7 +119,7 @@
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
                         <subviews>
                             <textView clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="scaleToFill" textAlignment="natural" translatesAutoresizingMaskIntoConstraints="NO" id="l5a-qO-DDF">
-                                <rect key="frame" x="10" y="74" width="394" height="798"/>
+                                <rect key="frame" x="10" y="74" width="394" height="749"/>
                                 <color key="backgroundColor" systemColor="systemBackgroundColor"/>
                                 <color key="textColor" systemColor="labelColor"/>
                                 <fontDescription key="fontDescription" name="HelveticaNeue" family="Helvetica Neue" pointSize="18"/>
@@ -129,6 +135,8 @@
                             <constraint firstItem="l5a-qO-DDF" firstAttribute="bottom" secondItem="sE1-pK-xKF" secondAttribute="bottom" constant="10" id="v0g-0s-pdL"/>
                         </constraints>
                     </view>
+                    <toolbarItems/>
+                    <simulatedToolbarMetrics key="simulatedBottomBarMetrics"/>
                     <connections>
                         <outlet property="noteField" destination="l5a-qO-DDF" id="P3j-b4-N5r"/>
                     </connections>
