@@ -17,6 +17,7 @@ class MainTableViewController: UITableViewController {
     
     var dateFormatter = DateFormatter()
     
+    
     let searchController = UISearchController(searchResultsController: nil)
     
     var isSearchBarEmpty: Bool {
@@ -40,7 +41,9 @@ class MainTableViewController: UITableViewController {
     
     // creating UI ( navigation items, etc )
     func createUI() {
+        
         view.backgroundColor = UIColor.systemGray6
+        tableView.backgroundColor = UIColor.init(red: 210  , green: 210, blue: 210, alpha: 1)
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editButtonPressed))
         searchController.searchResultsUpdater = self
@@ -107,6 +110,8 @@ class MainTableViewController: UITableViewController {
             if name == "" {
                 self.showErrorMessage(title: "Error", message: "Category name can't be empty")
             } else {
+                // creating new Note for newly created category
+                self.choosenCategory(action: UIAlertAction(title: "\(name)", style: .default))
                 self.mainData.arrayOfNotes.append(Notes(sectionName: "\(name)", sectionElements: []))
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
