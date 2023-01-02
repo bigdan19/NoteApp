@@ -24,7 +24,7 @@ class EntryViewController: UIViewController {
     
     @objc func didTapSave() {
         let today = Date.now
-        formater.dateFormat = "'created - 'HH:mm , d MMMM"
+        formater.dateFormat = "'created on 'MM/dd/yyyy"
         let dateStr = formater.string(from: today)
         if let text = noteField.text, !text.isEmpty {
             completion?(text, dateStr)
