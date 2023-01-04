@@ -6,6 +6,12 @@
 //
 
 import UIKit
+import MaterialComponents.MaterialDialogs
+import MaterialComponents.MaterialBanner
+import MaterialComponents.MaterialTextControls_FilledTextAreas
+import MaterialComponents.MaterialTextControls_FilledTextFields
+import MaterialComponents.MaterialTextControls_OutlinedTextAreas
+import MaterialComponents.MaterialTextControls_OutlinedTextFields
 
 class MainTableViewController: UITableViewController {
     
@@ -41,9 +47,6 @@ class MainTableViewController: UITableViewController {
     
     // creating UI ( navigation items, etc )
     func createUI() {
-        
-        view.backgroundColor = UIColor.systemGray6
-        tableView.backgroundColor = UIColor.init(red: 210  , green: 210, blue: 210, alpha: 1)
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editButtonPressed))
         searchController.searchResultsUpdater = self
@@ -81,12 +84,14 @@ class MainTableViewController: UITableViewController {
     }
     
     
-    
     // custom UIAlert showing different errors
     func showErrorMessage(title: String, message: String) {
-        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "Ok", style: .default))
-        present(ac, animated: true)
+        
+        let alertController = MDCAlertController(title: title, message: message)
+        let action = MDCAlertAction(title: "OK") { (action) in print("OK") }
+        alertController.addAction(action)
+        alertController.cornerRadius = 10
+        present(alertController, animated: true)
     }
     
     @objc func editButtonPressed() {
@@ -103,12 +108,13 @@ class MainTableViewController: UITableViewController {
     
     // Creating new Category for notes
     @objc func organizeButtonPressed() {
+        
         let ac = UIAlertController(title: "Add Category", message: nil, preferredStyle: .alert)
         ac.addTextField()
         let submitAction = UIAlertAction(title: "Create", style: .default) { [unowned ac] _ in
             guard let name = ac.textFields![0].text else { return }
             if name == "" {
-                self.showErrorMessage(title: "Error", message: "Category name can't be empty")
+                self.showErrorMessage(title: "Empty", message: "Category name can't be empty")
             } else {
                 // creating new Note for newly created category
                 self.choosenCategory(action: UIAlertAction(title: "\(name)", style: .default))
@@ -130,7 +136,7 @@ class MainTableViewController: UITableViewController {
     // Creating new note in choosen category
     @objc func composeButtonPressed() {
         if mainData.arrayOfNotes.isEmpty {
-            showErrorMessage(title: "Error", message: "Please create at least one category")
+            showErrorMessage(title: "No category", message: "Please create at least one category")
         } else {
             let ac = UIAlertController(title: "Choose Category", message: nil, preferredStyle: .actionSheet)
             for i in 0..<mainData.arrayOfNotes.count {

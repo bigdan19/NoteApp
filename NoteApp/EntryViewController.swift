@@ -6,6 +6,7 @@
 //
 
 import UIKit
+import MaterialComponents.MaterialDialogs
 
 class EntryViewController: UIViewController {
     @IBOutlet var noteField: UITextView!
@@ -28,8 +29,17 @@ class EntryViewController: UIViewController {
         let dateStr = formater.string(from: today)
         if let text = noteField.text, !text.isEmpty {
             completion?(text, dateStr)
+        } else {
+            showErrorMessage(title: "No text", message: "New note cannot be empty")
         }
-        
+    }
+    
+    func showErrorMessage(title: String, message: String) {
+        let alertController = MDCAlertController(title: title, message: message)
+        let action = MDCAlertAction(title: "OK") { (action) in print("OK") }
+        alertController.addAction(action)
+        alertController.cornerRadius = 10
+        present(alertController, animated: true)
     }
     
     
