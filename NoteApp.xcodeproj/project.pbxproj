@@ -16,6 +16,8 @@
 		65A55D99283CFFA300884763 /* NoteViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A55D98283CFFA300884763 /* NoteViewController.swift */; };
 		65A55D9B283CFFB600884763 /* EntryViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65A55D9A283CFFB600884763 /* EntryViewController.swift */; };
 		65BF0FA5283AD53C00E0A436 /* Notes.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65BF0FA4283AD53C00E0A436 /* Notes.swift */; };
+		65C35D47296C108B008C729A /* Note.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = 65C35D45296C108B008C729A /* Note.xcdatamodeld */; };
+		65C35D49296C1306008C729A /* Note.swift in Sources */ = {isa = PBXBuildFile; fileRef = 65C35D48296C1306008C729A /* Note.swift */; };
 		817D0C95E197289C3A0DDB88 /* Pods_NoteApp.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = DE48A94D304B6272735BDB8D /* Pods_NoteApp.framework */; };
 /* End PBXBuildFile section */
 
@@ -32,6 +34,8 @@
 		65A55D98283CFFA300884763 /* NoteViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NoteViewController.swift; sourceTree = "<group>"; };
 		65A55D9A283CFFB600884763 /* EntryViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = EntryViewController.swift; sourceTree = "<group>"; };
 		65BF0FA4283AD53C00E0A436 /* Notes.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Notes.swift; sourceTree = "<group>"; };
+		65C35D46296C108B008C729A /* Note.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Note.xcdatamodel; sourceTree = "<group>"; };
+		65C35D48296C1306008C729A /* Note.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Note.swift; sourceTree = "<group>"; };
 		DE48A94D304B6272735BDB8D /* Pods_NoteApp.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_NoteApp.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		ED439F3A18D0AC93715981DB /* Pods-NoteApp.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-NoteApp.release.xcconfig"; path = "Target Support Files/Pods-NoteApp/Pods-NoteApp.release.xcconfig"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -75,10 +79,12 @@
 				65457D9C28319B9000900199 /* MainTableViewController.swift */,
 				65A55D98283CFFA300884763 /* NoteViewController.swift */,
 				65A55D9A283CFFB600884763 /* EntryViewController.swift */,
+				65C35D48296C1306008C729A /* Note.swift */,
 				65457D8E283197DF00900199 /* Main.storyboard */,
 				65457D91283197E200900199 /* Assets.xcassets */,
 				65457D93283197E200900199 /* LaunchScreen.storyboard */,
 				65457D96283197E200900199 /* Info.plist */,
+				65C35D45296C108B008C729A /* Note.xcdatamodeld */,
 			);
 			path = NoteApp;
 			sourceTree = "<group>";
@@ -218,7 +224,9 @@
 				65457D9D28319B9000900199 /* MainTableViewController.swift in Sources */,
 				65457D89283197DF00900199 /* AppDelegate.swift in Sources */,
 				65457D8B283197DF00900199 /* SceneDelegate.swift in Sources */,
+				65C35D49296C1306008C729A /* Note.swift in Sources */,
 				65A55D99283CFFA300884763 /* NoteViewController.swift in Sources */,
+				65C35D47296C108B008C729A /* Note.xcdatamodeld in Sources */,
 				65BF0FA5283AD53C00E0A436 /* Notes.swift in Sources */,
 				65A55D9B283CFFB600884763 /* EntryViewController.swift in Sources */,
 			);
@@ -450,6 +458,19 @@
 			defaultConfigurationName = Release;
 		};
 /* End XCConfigurationList section */
+
+/* Begin XCVersionGroup section */
+		65C35D45296C108B008C729A /* Note.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				65C35D46296C108B008C729A /* Note.xcdatamodel */,
+			);
+			currentVersion = 65C35D46296C108B008C729A /* Note.xcdatamodel */;
+			path = Note.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = 65457D7D283197DF00900199 /* Project object */;
 }

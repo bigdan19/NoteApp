@@ -7,6 +7,7 @@
 
 import UIKit
 import MaterialComponents.MaterialDialogs
+import CoreData
 
 class EntryViewController: UIViewController {
     @IBOutlet var noteField: UITextView!
@@ -32,6 +33,7 @@ class EntryViewController: UIViewController {
         } else {
             showErrorMessage(title: "No text", message: "New note cannot be empty")
         }
+        
     }
     
     func showErrorMessage(title: String, message: String) {
