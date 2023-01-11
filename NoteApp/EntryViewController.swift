@@ -28,6 +28,10 @@ class EntryViewController: UIViewController {
         let dateStr = formater.string(from: today)
         if let text = noteField.text, !text.isEmpty {
             completion?(text, dateStr)
+        } else {
+            let ac = UIAlertController(title: "Error", message: "Please type something", preferredStyle: .alert)
+            ac.addAction(UIAlertAction(title: "Ok", style: .default))
+            present(ac, animated: true)
         }
         
     }

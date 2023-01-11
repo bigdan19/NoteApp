@@ -41,9 +41,6 @@ class MainTableViewController: UITableViewController {
     
     // creating UI ( navigation items, etc )
     func createUI() {
-        
-        view.backgroundColor = UIColor.systemGray6
-        tableView.backgroundColor = UIColor.init(red: 210  , green: 210, blue: 210, alpha: 1)
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editButtonPressed))
         searchController.searchResultsUpdater = self
@@ -59,6 +56,7 @@ class MainTableViewController: UITableViewController {
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
         let add = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(composeButtonPressed))
         toolbarItems = [organize, flexibleSpace, add]
+        
     }
     
     
@@ -190,7 +188,7 @@ class MainTableViewController: UITableViewController {
         if !isFiltering {
             guard let header = view as? UITableViewHeaderFooterView else { return }
             header.textLabel?.textColor = .black
-            header.textLabel?.font = UIFont.boldSystemFont(ofSize: 24)
+            header.textLabel?.font = UIFont.boldSystemFont(ofSize: 26)
             header.textLabel?.frame = header.bounds.offsetBy(dx: 20, dy: 0)
         }
     }
