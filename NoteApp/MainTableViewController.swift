@@ -41,6 +41,7 @@ class MainTableViewController: UITableViewController {
     
     // creating UI ( navigation items, etc )
     func createUI() {
+        self.tableView.backgroundView = UIImageView(image: UIImage(named: "back.jpg"))
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editButtonPressed))
         searchController.searchResultsUpdater = self
@@ -187,9 +188,10 @@ class MainTableViewController: UITableViewController {
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
         if !isFiltering {
             guard let header = view as? UITableViewHeaderFooterView else { return }
-            header.textLabel?.textColor = .black
-            header.textLabel?.font = UIFont.boldSystemFont(ofSize: 26)
-            header.textLabel?.frame = header.bounds.offsetBy(dx: 20, dy: 0)
+            header.textLabel?.textColor = .darkGray
+            header.textLabel?.font = UIFont(name: "Georgia Bold", size: 28)
+//            header.textLabel?.font = UIFont.boldSystemFont(ofSize: 28)
+            header.textLabel?.frame = header.bounds.offsetBy(dx: 30, dy: 0)
         }
     }
     
@@ -216,16 +218,15 @@ class MainTableViewController: UITableViewController {
         cell.cellTitle.text = note.title
         cell.cellText.text = note.note
         cell.cellDate.text = note.date
-        cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
-        cell.layer.borderWidth = 0.1
-        cell.layer.borderColor = CGColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1)
-        cell.layer.cornerRadius = 10
-        cell.layer.masksToBounds = true
         return cell
     }
     
     override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 70
+    }
+    
+    override func tableView(_ tableView: UITableView, heightForHeaderInSection section: Int) -> CGFloat {
+        return 45
     }
     
     override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
