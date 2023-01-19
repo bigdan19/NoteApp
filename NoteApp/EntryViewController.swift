@@ -8,9 +8,10 @@
 import UIKit
 
 class EntryViewController: UIViewController {
+    @IBOutlet weak var noteTitleField: UITextField!
     @IBOutlet var noteField: UITextView!
     
-    public var completion: ((String, String) -> Void)?
+    public var completion: ((String, String, String) -> Void)?
     
     private var formater = DateFormatter()
     
@@ -18,7 +19,7 @@ class EntryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        noteField.becomeFirstResponder()
+        noteTitleField.becomeFirstResponder()
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(didTapSave))
     }
     
@@ -26,8 +27,8 @@ class EntryViewController: UIViewController {
         let today = Date.now
         formater.dateFormat = "'created on 'MM/dd/yyyy"
         let dateStr = formater.string(from: today)
-        if let text = noteField.text, !text.isEmpty {
-            completion?(text, dateStr)
+        if let text = noteField.text, !text.isEmpty, let title = noteTitleField.text, !title.isEmpty {
+            completion?(title, text, dateStr)
         } else {
             let ac = UIAlertController(title: "Error", message: "Please type something", preferredStyle: .alert)
             ac.addAction(UIAlertAction(title: "Ok", style: .default))

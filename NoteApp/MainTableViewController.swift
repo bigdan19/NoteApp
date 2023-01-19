@@ -148,11 +148,11 @@ class MainTableViewController: UITableViewController {
         guard let vc = storyboard?.instantiateViewController(withIdentifier: "new") as? EntryViewController else { return }
         vc.title = "New Note"
         vc.navigationItem.largeTitleDisplayMode = .never
-        vc.completion = { note, date in
+        vc.completion = { title, note, date in
             self.navigationController?.popToRootViewController(animated: true)
             for i in 0..<self.mainData.arrayOfNotes.count {
                 if self.mainData.arrayOfNotes[i].sectionName == action.title! {
-                    self.mainData.arrayOfNotes[i].sectionElements.append(Elements(note: note, date: date))
+                    self.mainData.arrayOfNotes[i].sectionElements.append(Elements(title: title, note: note, date: date))
                     self.createDictOfDataForFiltering()
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
@@ -206,16 +206,16 @@ class MainTableViewController: UITableViewController {
     
     // Creating cell in tableView
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath)
+        let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
         let note: Elements
         if isFiltering {
             note = filteredData[indexPath.row]
-            cell.detailTextLabel?.text = filteredData[indexPath.row].date
         } else {
             note = mainData.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
-            cell.detailTextLabel?.text = mainData.arrayOfNotes[indexPath.section].sectionElements[indexPath.row].date
         }
-        cell.textLabel?.text = note.note
+        cell.cellTitle.text = note.title
+        cell.cellText.text = note.note
+        cell.cellDate.text = note.date
         cell.textLabel?.font = UIFont.systemFont(ofSize: 18)
         cell.layer.borderWidth = 0.1
         cell.layer.borderColor = CGColor(red: 0.8, green: 0.8, blue: 0.8, alpha: 1)
@@ -224,6 +224,9 @@ class MainTableViewController: UITableViewController {
         return cell
     }
     
+    override func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
+        return 70
+    }
     
     override func tableView(_ tableView: UITableView, editingStyleForRowAt indexPath: IndexPath) -> UITableViewCell.EditingStyle {
         return .delete
@@ -285,7 +288,7 @@ class MainTableViewController: UITableViewController {
     func filterContentForSearchText(_ searchText: String) {
         
         filteredData = simpleArrayOfData.filter({ (element: Elements) -> Bool in
-            return element.note.lowercased().contains(searchText.lowercased())
+            return element.title.lowercased().contains(searchText.lowercased())
         })
         DispatchQueue.main.async {
             self.tableView.reloadData()

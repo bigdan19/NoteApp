@@ -18,6 +18,7 @@ struct NotesArr: Codable {
 }
 
 struct Elements: Codable {
+    var title: String
     var note: String
     var date: String
 }
