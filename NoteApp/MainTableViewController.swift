@@ -241,6 +241,7 @@ class MainTableViewController: UITableViewController {
             vc.navigationItem.largeTitleDisplayMode = .never
             vc.title = "Note"
             vc.note = note.note
+            vc.titleOfNote = note.title
             navigationController?.pushViewController(vc, animated: true)
         } else {
             guard let vc = storyboard?.instantiateViewController(withIdentifier: "note") as? NoteViewController else { return }
@@ -248,6 +249,7 @@ class MainTableViewController: UITableViewController {
             vc.navigationItem.largeTitleDisplayMode = .never
             vc.title = "Note"
             vc.note = note.note
+            vc.titleOfNote = note.title
             navigationController?.pushViewController(vc, animated: true)
         }
     }

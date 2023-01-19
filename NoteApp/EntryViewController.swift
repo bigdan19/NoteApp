@@ -19,7 +19,12 @@ class EntryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        guard let image = UIImage(named: "back.jpg") else {
+            return
+        }
+        self.view.backgroundColor = UIColor(patternImage: image)
         noteTitleField.becomeFirstResponder()
+        noteField.layer.cornerRadius = 14
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Save", style: .done, target: self, action: #selector(didTapSave))
     }
     
