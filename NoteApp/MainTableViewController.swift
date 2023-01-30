@@ -41,7 +41,7 @@ class MainTableViewController: UITableViewController {
     
     // creating UI ( navigation items, etc )
     func createUI() {
-        self.tableView.backgroundView = UIImageView(image: UIImage(named: "back.jpg"))
+        self.tableView.backgroundView = UIImageView(image: UIImage(named: "back.png"))
         navigationController?.navigationBar.prefersLargeTitles = true
         navigationItem.rightBarButtonItem = UIBarButtonItem(title: "Edit", style: .plain, target: self, action: #selector(editButtonPressed))
         searchController.searchResultsUpdater = self

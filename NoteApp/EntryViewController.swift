@@ -19,7 +19,7 @@ class EntryViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        guard let image = UIImage(named: "back.jpg") else {
+        guard let image = UIImage(named: "back.png") else {
             return
         }
         self.view.backgroundColor = UIColor(patternImage: image)

@@ -11,6 +11,7 @@ class NoteViewController: UIViewController {
     
     @IBOutlet weak var titleLabel: UILabel!
     @IBOutlet var noteLabel: UITextView!
+
     
     public var note: String = ""
     public var titleOfNote: String = ""
@@ -19,11 +20,10 @@ class NoteViewController: UIViewController {
         super.viewDidLoad()
         noteLabel.text = note
         titleLabel.text = titleOfNote
-        guard let image = UIImage(named: "back.jpg") else {
+        guard let image = UIImage(named: "back.png") else {
             return
         }
         self.view.backgroundColor = UIColor(patternImage: image)
         noteLabel.layer.cornerRadius = 14
     }
-    
 }
