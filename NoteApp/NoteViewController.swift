@@ -25,5 +25,6 @@ class NoteViewController: UIViewController {
         }
         self.view.backgroundColor = UIColor(patternImage: image)
         noteLabel.layer.cornerRadius = 14
+        noteLabel.textContainer.lineFragmentPadding = 15
     }
 }
