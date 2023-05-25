@@ -18,6 +18,7 @@ class NoteViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        navigationItem.rightBarButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(shareButtonTapped))
         noteLabel.text = note
         titleLabel.text = titleOfNote
         guard let image = UIImage(named: "back.png") else {
@@ -26,5 +27,15 @@ class NoteViewController: UIViewController {
         self.view.backgroundColor = UIColor(patternImage: image)
         noteLabel.layer.cornerRadius = 14
         noteLabel.textContainer.lineFragmentPadding = 15
+    }
+    
+    @objc func shareButtonTapped() {
+        if let title = titleLabel.text, let description = noteLabel.text {
+            let textToShare = "NoteApp note ... \n\nTitle: \(title)\n\nDescription: \(description)"
+            let activityViewController = UIActivityViewController(activityItems: [textToShare], applicationActivities: nil)
+            present(activityViewController, animated: true, completion: nil)
+        } else {
+            print("Error occured")
+        }
     }
 }

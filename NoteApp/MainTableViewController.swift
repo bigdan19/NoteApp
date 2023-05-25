@@ -11,9 +11,9 @@ class MainTableViewController: UITableViewController {
     
     let defaults = UserDefaults.standard
     
-    var mainData: NotesArr = NotesArr(arrayOfNotes: [])
-    var simpleArrayOfData: [Elements] = []
-    var filteredData: [Elements] = []
+    var mainData: ArrayOfSectionsWithNotes = ArrayOfSectionsWithNotes(arrayOfNotes: [])
+    var simpleArrayOfData: [Note] = []
+    var filteredData: [Note] = []
     
     var dateFormatter = DateFormatter()
     
@@ -53,9 +53,9 @@ class MainTableViewController: UITableViewController {
     }
     
     func configureKeyboardToolbar() {
-        let organize = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(organizeButtonPressed))
+        let organize = UIBarButtonItem(barButtonSystemItem: .organize, target: self, action: #selector(createCategoryButtonPressed))
         let flexibleSpace = UIBarButtonItem(barButtonSystemItem: .flexibleSpace, target: nil, action: nil)
-        let add = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(composeButtonPressed))
+        let add = UIBarButtonItem(barButtonSystemItem: .compose, target: self, action: #selector(createNewNoteButtonPressed))
         toolbarItems = [organize, flexibleSpace, add]
         
     }
@@ -73,7 +73,7 @@ class MainTableViewController: UITableViewController {
     func decodeData() {
         if let savedData = defaults.object(forKey: "SavedData") as? Data {
             let decoder = JSONDecoder()
-            if let loadedData = try? decoder.decode(NotesArr.self, from: savedData){
+            if let loadedData = try? decoder.decode(ArrayOfSectionsWithNotes.self, from: savedData){
                 mainData = loadedData
             }
         }
@@ -101,7 +101,7 @@ class MainTableViewController: UITableViewController {
     
     
     // Creating new Category for notes
-    @objc func organizeButtonPressed() {
+    @objc func createCategoryButtonPressed() {
         let ac = UIAlertController(title: "Add Category", message: nil, preferredStyle: .alert)
         ac.addTextField()
         let submitAction = UIAlertAction(title: "Create", style: .default) { [unowned ac] _ in
@@ -111,7 +111,7 @@ class MainTableViewController: UITableViewController {
             } else {
                 // creating new Note for newly created category
                 self.choosenCategory(action: UIAlertAction(title: "\(name)", style: .default))
-                self.mainData.arrayOfNotes.append(Notes(sectionName: "\(name)", sectionElements: []))
+                self.mainData.arrayOfNotes.append(SectionWithNotes(sectionName: "\(name)", sectionNotesArr: []))
                 DispatchQueue.main.async {
                     self.tableView.reloadData()
                     self.encodeData()
@@ -126,8 +126,8 @@ class MainTableViewController: UITableViewController {
     
     
     
-    // Creating new note in choosen category
-    @objc func composeButtonPressed() {
+    // Creating new note and choosing under which category
+    @objc func createNewNoteButtonPressed() {
         if mainData.arrayOfNotes.isEmpty {
             showErrorMessage(title: "Error", message: "Please create at least one category")
         } else {
@@ -153,7 +153,7 @@ class MainTableViewController: UITableViewController {
             self.navigationController?.popToRootViewController(animated: true)
             for i in 0..<self.mainData.arrayOfNotes.count {
                 if self.mainData.arrayOfNotes[i].sectionName == action.title! {
-                    self.mainData.arrayOfNotes[i].sectionElements.append(Elements(title: title, note: note, date: date))
+                    self.mainData.arrayOfNotes[i].sectionNotesArr.append(Note(title: title, note: note, date: date))
                     self.createDictOfDataForFiltering()
                     DispatchQueue.main.async {
                         self.tableView.reloadData()
@@ -182,7 +182,7 @@ class MainTableViewController: UITableViewController {
         if isFiltering {
             return filteredData.count
         }
-        return mainData.arrayOfNotes[section].sectionElements.count
+        return mainData.arrayOfNotes[section].sectionNotesArr.count
     }
     
     override func tableView(_ tableView: UITableView, willDisplayHeaderView view: UIView, forSection section: Int) {
@@ -209,11 +209,11 @@ class MainTableViewController: UITableViewController {
     // Creating cell in tableView
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "cell", for: indexPath) as! CustomTableViewCell
-        let note: Elements
+        let note: Note
         if isFiltering {
             note = filteredData[indexPath.row]
         } else {
-            note = mainData.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
+            note = mainData.arrayOfNotes[indexPath.section].sectionNotesArr[indexPath.row]
         }
         cell.cellTitle.text = note.title
         cell.cellText.text = note.note
@@ -245,7 +245,7 @@ class MainTableViewController: UITableViewController {
             navigationController?.pushViewController(vc, animated: true)
         } else {
             guard let vc = storyboard?.instantiateViewController(withIdentifier: "note") as? NoteViewController else { return }
-            let note = mainData.arrayOfNotes[indexPath.section].sectionElements[indexPath.row]
+            let note = mainData.arrayOfNotes[indexPath.section].sectionNotesArr[indexPath.row]
             vc.navigationItem.largeTitleDisplayMode = .never
             vc.title = "Note"
             vc.note = note.note
@@ -262,35 +262,38 @@ class MainTableViewController: UITableViewController {
             
         } else {
             if editingStyle == .delete {
-                tableView.beginUpdates()
-                
-                // Deleting item from our database
-                mainData.arrayOfNotes[indexPath.section].sectionElements.remove(at: indexPath.row)
-                createDictOfDataForFiltering()
-                tableView.deleteRows(at: [indexPath], with: .fade)
-                
-                
-                // Checking if there is no more notes in a category - remove category
-                if mainData.arrayOfNotes[indexPath.section].sectionElements.count == 0 {
-                    mainData.arrayOfNotes.remove(at: indexPath.section)
-                    tableView.deleteSections(IndexSet(integer: indexPath.section), with: .fade)
-                }
-                tableView.endUpdates()
-                
-                // Reloading tableView data after 0.3 sec
-                DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 ){
-                    self.tableView.reloadData()
-                    self.encodeData()
-                }
+                deleteCell(indexPath: indexPath)
             }
         }
     }
     
+    func deleteCell(indexPath: IndexPath) {
+        tableView.beginUpdates()
+        
+        // Deleting item from our database
+        mainData.arrayOfNotes[indexPath.section].sectionNotesArr.remove(at: indexPath.row)
+        createDictOfDataForFiltering()
+        tableView.deleteRows(at: [indexPath], with: .fade)
+        
+        
+        // Checking if there is no more notes in a category - remove category
+        if mainData.arrayOfNotes[indexPath.section].sectionNotesArr.count == 0 {
+            mainData.arrayOfNotes.remove(at: indexPath.section)
+            tableView.deleteSections(IndexSet(integer: indexPath.section), with: .fade)
+        }
+        tableView.endUpdates()
+        
+        // Reloading tableView data after 0.3 sec
+        DispatchQueue.main.asyncAfter(deadline: .now() + 0.3 ){
+            self.tableView.reloadData()
+            self.encodeData()
+        }
+    }
     
     // filtering function
     func filterContentForSearchText(_ searchText: String) {
         
-        filteredData = simpleArrayOfData.filter({ (element: Elements) -> Bool in
+        filteredData = simpleArrayOfData.filter({ (element: Note) -> Bool in
             return element.title.lowercased().contains(searchText.lowercased())
         })
         DispatchQueue.main.async {
@@ -304,8 +307,8 @@ class MainTableViewController: UITableViewController {
     func createDictOfDataForFiltering() {
         simpleArrayOfData = []
         for i in 0..<mainData.arrayOfNotes.count {
-            for j in 0..<mainData.arrayOfNotes[i].sectionElements.count {
-                simpleArrayOfData.append(mainData.arrayOfNotes[i].sectionElements[j])
+            for j in 0..<mainData.arrayOfNotes[i].sectionNotesArr.count {
+                simpleArrayOfData.append(mainData.arrayOfNotes[i].sectionNotesArr[j])
             }
         }
     }
